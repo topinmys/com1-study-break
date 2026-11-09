@@ -1,8 +1,11 @@
--- Check-in now means the attendee has received their one reserved cup.
--- Keep the original migration unchanged so the baseline remains reproducible.
+-- check-in now means the attendee has received their one reserved cup.
+-- keep the original migration unchanged so the baseline remains reproducible.
+-- remove the old update signature before introducing the simpler check-in operation.
 drop function public.organiser_update(text, uuid, text, boolean);
+-- one timestamp now represents arrival and cup handover together.
 alter table private.attendees drop column collected_at;
 
+-- keep organiser totals derived from saved rows and protect the list with the session guard.
 create or replace function public.organiser_snapshot(p_hash text) returns jsonb
 language plpgsql security definer set search_path = '' as $$
 declare result jsonb;
@@ -15,6 +18,7 @@ begin
 end;
 $$;
 
+-- the row lock serialises updates; repeated true requests preserve the existing timestamp.
 create function public.organiser_update(p_hash text, p_id uuid, p_value boolean) returns jsonb
 language plpgsql security definer set search_path = '' as $$
 begin
@@ -27,5 +31,6 @@ begin
 end;
 $$;
 
+-- a new function signature needs explicit grants; public users cannot call it directly.
 revoke all on function public.organiser_update(text, uuid, boolean) from public, anon, authenticated;
 grant execute on function public.organiser_update(text, uuid, boolean) to service_role;

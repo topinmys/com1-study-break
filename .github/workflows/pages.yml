@@ -1,8 +1,10 @@
 name: Publish event page
+# optional github pages deployment; vercel is the primary host.
 on:
   workflow_dispatch:
 
 permissions:
+  # request only the permissions required to upload and publish a pages artifact.
   contents: read
   pages: write
   id-token: write
@@ -21,6 +23,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/configure-pages@v5
       - name: Package only the public frontend
+        # copy a fixed list of public files, never backend settings or attendee data.
         run: |
           mkdir -p public-site/assets
           cp index.html public-site/index.html

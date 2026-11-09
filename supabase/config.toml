@@ -1,11 +1,13 @@
+# local project label; the linked hosted reference is stored in ignored cli metadata.
 project_id = "com1-study-break"
 
 [api]
+# expose callable functions in public; attendee and session tables stay in private.
 enabled = true
 schemas = ["public"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
 
 [functions.event-api]
-# Students have no Supabase Auth account. The handler checks organiser sessions.
+# students have no supabase auth account. the handler checks organiser sessions.
 verify_jwt = false

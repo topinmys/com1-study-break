@@ -1,3 +1,4 @@
+# keep private settings, backend source, and local artifacts out of frontend uploads.
 .git/
 .github/
 .npm-cache/

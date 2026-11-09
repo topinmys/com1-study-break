@@ -1,13 +1,16 @@
--- All attendee/auth tables live outside the exposed public schema.
+-- original schema; the next migration changes check-in to include cup handover.
+-- all attendee/auth tables live outside the exposed public schema.
 create schema if not exists private;
 revoke all on schema private from public, anon, authenticated, service_role;
 
+-- the single settings row is also the lock used to serialise reservations.
 create table private.event_settings (
   id boolean primary key default true check (id),
   capacity integer not null default 150 check (capacity = 150)
 );
 insert into private.event_settings default values;
 
+-- normalised unique fields prevent duplicate students; timestamps record saved actions.
 create table private.attendees (
   id uuid primary key default gen_random_uuid(),
   full_name text not null check (char_length(full_name) between 2 and 100 and full_name = btrim(full_name)),
@@ -19,24 +22,28 @@ create table private.attendees (
   collected_at timestamptz,
   check (collected_at is null or (checked_in_at is not null and collected_at >= checked_in_at))
 );
+-- store hashes and expiry times, not usable session tokens.
 create table private.organiser_sessions (
   token_hash text primary key check (token_hash ~ '^[a-f0-9]{64}$'),
   expires_at timestamptz not null default (now() + interval '2 hours')
 );
+-- rate limits are shared by all running edge function instances.
 create table private.login_limits (
   bucket text primary key,
   started_at timestamptz not null,
   attempts integer not null check (attempts > 0)
 );
 
+-- enable row level security and grant no browser role access to private tables.
 alter table private.event_settings enable row level security;
 alter table private.attendees enable row level security;
 alter table private.organiser_sessions enable row level security;
 alter table private.login_limits enable row level security;
--- No public policies: only the tightly scoped definer functions below access data.
+-- no public policies: only the tightly scoped definer functions below access data.
 revoke all on all tables in schema private from public, anon, authenticated, service_role;
 alter default privileges in schema private revoke all on tables from public, anon, authenticated, service_role;
 
+-- return numbers only, without exposing names, emails, or student ids.
 create function public.event_capacity() returns jsonb
 language sql security definer set search_path = '' as $$
   select jsonb_build_object('capacity', s.capacity, 'registered', count(a.id),
@@ -44,11 +51,14 @@ language sql security definer set search_path = '' as $$
   from private.event_settings s left join private.attendees a on true group by s.capacity;
 $$;
 
+-- hold the settings row lock across duplicate checks, counting, and insertion.
 create function public.event_register(p_name text, p_email text, p_student_id text, p_telegram text)
 returns jsonb language plpgsql security definer set search_path = '' as $$
-declare limit_count integer; new_id uuid;
+declare
+  limit_count integer;
+  new_id uuid;
 begin
-  -- Serialise reservations on one row; the count and insert are one transaction.
+  -- serialise reservations on one row; the count and insert are one transaction.
   select capacity into limit_count from private.event_settings where id = true for update;
   if exists(select 1 from private.attendees where email = lower(btrim(p_email)) or student_id = upper(btrim(p_student_id))) then
     raise exception 'DUPLICATE' using errcode = 'P0001';
@@ -63,12 +73,13 @@ begin
 end;
 $$;
 
+-- fixed ten-minute limits apply per hashed ip bucket and globally.
 create function public.login_allow(p_bucket text) returns boolean
 language plpgsql security definer set search_path = '' as $$
 declare global_attempts integer; ip_attempts integer;
 begin
   if p_bucket !~ '^[a-f0-9]{64}$' then return false; end if;
-  -- Bound retained limiter storage; fixed windows are deliberately simple.
+  -- bound retained limiter storage; fixed windows are deliberately simple.
   delete from private.login_limits where started_at < now() - interval '1 day';
   insert into private.login_limits values ('global', now(), 1)
   on conflict (bucket) do update set
@@ -85,6 +96,7 @@ begin
 end;
 $$;
 
+-- the server supplies a hash; the database chooses the two-hour expiry.
 create function public.organiser_session_create(p_hash text) returns timestamptz
 language plpgsql security definer set search_path = '' as $$
 declare expiry timestamptz;
@@ -95,6 +107,7 @@ begin
 end;
 $$;
 
+-- every private read or update calls this guard before touching attendee data.
 create function private.require_session(p_hash text) returns void
 language plpgsql set search_path = '' as $$
 begin
@@ -104,6 +117,7 @@ begin
 end;
 $$;
 
+-- original dashboard snapshot; the follow-up migration removes separate cup collection.
 create function public.organiser_snapshot(p_hash text) returns jsonb
 language plpgsql security definer set search_path = '' as $$
 declare result jsonb;
@@ -116,6 +130,7 @@ begin
 end;
 $$;
 
+-- original two-step attendance operation, replaced by the next migration.
 create function public.organiser_update(p_hash text, p_id uuid, p_field text, p_value boolean) returns jsonb
 language plpgsql security definer set search_path = '' as $$
 declare attendee private.attendees;
@@ -137,6 +152,7 @@ begin
 end;
 $$;
 
+-- deleting this hashed session makes future requests with its token fail.
 create function public.organiser_logout(p_hash text) returns void
 language plpgsql security definer set search_path = '' as $$
 begin
@@ -145,7 +161,19 @@ begin
 end;
 $$;
 
--- PostgreSQL grants PUBLIC function execution by default. Revoke it explicitly.
+-- postgresql grants public function execution by default. revoke it explicitly.
 revoke all on function private.require_session(text) from public, anon, authenticated, service_role;
-revoke all on function public.event_capacity(), public.event_register(text,text,text,text), public.login_allow(text), public.organiser_session_create(text), public.organiser_snapshot(text), public.organiser_update(text,uuid,text,boolean), public.organiser_logout(text) from public, anon, authenticated;
-grant execute on function public.event_capacity(), public.event_register(text,text,text,text), public.login_allow(text), public.organiser_session_create(text), public.organiser_snapshot(text), public.organiser_update(text,uuid,text,boolean), public.organiser_logout(text) to service_role;
+revoke all on function public.event_capacity(),
+  public.event_register(text,text,text,text),
+  public.login_allow(text),
+  public.organiser_session_create(text),
+  public.organiser_snapshot(text),
+  public.organiser_update(text,uuid,text,boolean),
+  public.organiser_logout(text) from public, anon, authenticated;
+grant execute on function public.event_capacity(),
+  public.event_register(text,text,text,text),
+  public.login_allow(text),
+  public.organiser_session_create(text),
+  public.organiser_snapshot(text),
+  public.organiser_update(text,uuid,text,boolean),
+  public.organiser_logout(text) to service_role;

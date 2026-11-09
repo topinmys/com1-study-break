@@ -1,0 +1,10 @@
+node_modules/
+.npm-cache/
+.deployment/
+.vercel/
+dist/
+test-results/
+package-lock.json
+assets/
+.env*
+supabase/.env*

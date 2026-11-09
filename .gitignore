@@ -1,8 +1,11 @@
+# downloaded development tools
 node_modules/
 .npm-cache/
+# private settings stay local; the placeholder example may be committed.
 .env
 .env.*
 !.env.example
+# generated cli metadata, builds, and test output
 supabase/.temp/
 supabase/.branches/
 test-results/
