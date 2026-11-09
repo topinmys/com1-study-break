@@ -7,6 +7,10 @@
   <meta name="description" content="Take a well-earned pause at COM1. Register for the Computing Club study break and reserve one cup of bubble tea.">
   <title>COM1 Study Break & Bubble Tea</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Keep Tailwind utilities while preserving this page's custom typography and inputs.
+    if (window.tailwind) tailwind.config = { corePlugins: { preflight: false } };
+  </script>
   <style>
     :root{--cream:#faf6ee;--ink:#303c35;--muted:#626b60;--green:#365b46;--pink:#f2dce1;--line:#dedfd2;--berry:#875167}
     *{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.55 'Segoe UI',Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.65}button,input,a{outline-offset:4px}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #875167}button{min-height:48px}a{color:var(--green)}[hidden]{display:none!important}

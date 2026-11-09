@@ -2,11 +2,13 @@
 
 A small event registration and organiser check-in app for an NUS Computing Club recruitment submission. Cream, sage and pink styling, a mobile layout, and inline SVG bubble-tea illustrations. No build step for the website.
 
+**Live website:** [com1-study-break.vercel.app](https://com1-study-break.vercel.app)
+
 **Event:** COM1 Foyer, Thursday, 7–9 PM. **No calendar date is confirmed.** There are 150 reservations. Each saved registration reserves one cup. One registration and one cup per student; no walk-ins.
 
 ## Start here
 
-The frontend is configured with this project's public Supabase URL and publishable key. The database migrations and Edge Function have been deployed. Frontend publishing is described below. Registrations are shared in Supabase; they are never saved as an authoritative local browser database.
+The frontend is deployed publicly on Vercel and configured with this project's public Supabase URL and publishable key. The database migrations and Edge Function are deployed on Supabase. Registrations are shared in Supabase; they are never saved as an authoritative local browser database.
 
 From this repository in PowerShell, with Node.js 22 or later installed:
 
@@ -32,7 +34,7 @@ Supabase Postgres
     enforce uniqueness, capacity, session expiry and attendance rules
 ```
 
-- **Frontend:** a single HTML file holds markup, styles and JavaScript. Tailwind loads from its CDN as requested; custom CSS supplies the event design and remains readable if that CDN is unavailable. It uses native `fetch`, so no frontend Supabase SDK is needed.
+- **Frontend:** a single HTML file holds markup, styles and JavaScript. Tailwind loads from its CDN as requested, with its default reset disabled so it preserves the event's custom headings and input styling. Custom CSS remains readable if that CDN is unavailable. It uses native `fetch`, so no frontend Supabase SDK is needed.
 - **Edge Function:** the only API used by the browser. It validates all registration inputs, checks the server-configured PIN with bcrypt, rate limits logins and returns safe error codes. It does not log attendee details or PINs.
 - **Database:** shared, persistent source of truth for all devices. No attendee database or session token is kept in `localStorage` or `sessionStorage`. The organiser token stays in page memory; refreshing requires another login.
 - **Why Supabase:** PostgreSQL gives real transactions and unique constraints, while Edge Functions let a static Vercel or GitHub Pages site use server-side secrets. It avoids maintaining a separate application server for a 150-person event. The tradeoff is reliance on an internet connection and an external service.
@@ -149,6 +151,8 @@ npx.cmd vercel deploy --prod --yes
 `vercel.json` disables framework detection and dependency installation, runs the native Node build script, and publishes only `dist/`. The build copies the single HTML file there. `.vercelignore` excludes backend code, private settings, tests and local artifacts from uploads. The output contains no server secrets. The project is linked locally through ignored `.vercel/` metadata. See [Vercel CLI deployment](https://vercel.com/docs/cli/deploy).
 
 After deploying, add the returned stable production origin to `ALLOWED_ORIGINS` in `supabase/.env.local`, then upload secrets again if that origin changed. Verify capacity and organiser login through the production URL. Do not seed fake attendees in the real event database.
+
+The initial production deployment was checked anonymously in Chromium at a 360px viewport. Live capacity, organiser PIN login, the empty dashboard, and logout worked. Private configuration/backend paths returned 404. The real Tailwind CDN was also checked for correct heading size and input padding after a reset-style conflict was fixed. No test registrations were created on the hosted project. Registration/check-in writes and the simultaneous final-place race have not been exercised against production.
 
 ## Optional: publish to GitHub Pages
 
