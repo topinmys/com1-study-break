@@ -1,0 +1,17 @@
+{
+  "name": "com1-study-break",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preview": "node scripts/preview.mjs",
+    "test": "node --test tests/database.test.mjs tests/api.test.mjs",
+    "test:ui": "node --test tests/ui.test.mjs",
+    "test:live": "node --test tests/live.test.mjs",
+    "pin:hash": "node scripts/hash-pin.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.3.14",
+    "bcryptjs": "3.0.3",
+    "playwright": "1.56.1"
+  }
+}

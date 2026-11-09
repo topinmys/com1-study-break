@@ -1,0 +1,9 @@
+node_modules/
+.npm-cache/
+.env
+.env.*
+!.env.example
+supabase/.temp/
+supabase/.branches/
+test-results/
+*.log
