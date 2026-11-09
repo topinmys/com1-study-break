@@ -42,7 +42,7 @@ Supabase Postgres
 | File | Purpose |
 | --- | --- |
 | `index.html` | Student form, confirmation, PIN screen and organiser dashboard |
-| `supabase/migrations/202611080001_event.sql` | Tables, permissions and atomic database functions |
+| `supabase/migrations/` | Original schema and the follow-up migration making check-in mean cup handover |
 | `supabase/functions/event-api/handler.js` | Request validation and authentication; also exercised by Node tests |
 | `supabase/functions/event-api/index.ts` | Thin Deno entry point; calls the Supabase Data API |
 | `supabase/.env.example` | Private configuration names, with placeholders only |
@@ -162,9 +162,9 @@ The lock is released automatically on commit or error. If the insert fails, noth
 
 ### Attendance and handing out cups
 
-The two timestamps represent separate facts: arrival and collection. A null timestamp means the action has not been recorded. Collecting requires check-in, and check-in cannot be removed while collection remains recorded. Database constraints and the update function both enforce the relationship.
+Check-in means the attendee has received their one reserved cup. One `checked_in_at` timestamp records this combined action; null means it has not been recorded. The dashboard has one check-in button and one checked-in/cups-given total. Undo corrects a recording mistake.
 
-Updates say **set `collected` to `true`**, rather than toggle whatever value happens to be in the database. Repeating the same request leaves the existing timestamp unchanged. The attendee row is locked during changes, preventing two volunteers from producing contradictory saved states. Counters are calculated from saved timestamps, not incremented in the browser.
+Updates explicitly say **set check-in to `true` or `false`**, rather than toggle whatever value happens to be in the database. Repeating the same request leaves the existing timestamp unchanged. The attendee row is locked during changes, preventing two volunteers from producing contradictory saved states. Counters are calculated from saved timestamps, not incremented in the browser.
 
 The screen disables controls during a save, waits for the server, and refreshes the snapshot. It polls every five seconds, retaining the search query, card focus and expanded contact details. A successful save is never guessed from a tap. After an ambiguous network failure, refresh and check the saved state before issuing a cup. The app records collection; volunteers still need to coordinate the physical handover.
 
@@ -193,11 +193,11 @@ npm.cmd test
 npm.cmd run test:ui
 ```
 
-`npm test` runs the migration and actual SQL functions in **PGlite, an embedded PostgreSQL engine**, and routes API requests through the same handler that the Edge Function serves. It checks input normalisation, domain configuration, duplicate constraints, RLS/permission denial, 150-place boundary, sessions and expiry, bcrypt PINs, persistent rate limits, idempotent timestamps, collection ordering, undo and database failures.
+`npm test` runs all migrations and actual SQL functions in **PGlite, an embedded PostgreSQL engine**, and routes API requests through the same handler that the Edge Function serves. It checks input normalisation, domain configuration, duplicate constraints, RLS/permission denial, 150-place boundary, sessions and expiry, bcrypt PINs, persistent rate limits, idempotent combined check-in, undo, rejection of obsolete separate-collection actions, and database failures.
 
 `test:ui` drives Chromium at desktop and narrow phone sizes. It uses the actual HTML, handler and temporary SQL database over local HTTP. It checks registration and persistence after page refresh, duplicates, safe rendering of HTML-like names, network failures without false confirmations, capacity loss, organiser actions/undo, search, a second session seeing polling updates, logout and no horizontal overflow. It also verifies the unconfigured state. Screenshots are written under ignored `test-results/`. The tests block Tailwind's CDN to verify the CSS fallback.
 
-**Verification during implementation:** 13 SQL/API tests and 5 browser tests passed. The Edge Function entry point passed `deno check --node-modules-dir=manual supabase/functions/event-api/index.ts`. Desktop and mobile screenshots were visually reviewed. The preview returned the frontend successfully and refused a request for a server configuration file. The project owner subsequently linked the hosted Supabase project with the CLI; the backend has not yet been deployed. The optional local Supabase test was skipped because no local instance was configured.
+**Verification during implementation:** 14 SQL/API tests and 5 browser tests passed. The Edge Function entry point passed `deno check --node-modules-dir=manual supabase/functions/event-api/index.ts`. Desktop and mobile screenshots were visually reviewed. The preview returned the frontend successfully and refused a request for a server configuration file. The project owner subsequently linked the hosted Supabase project with the CLI; the backend has not yet been deployed. The optional local Supabase test was skipped because no local instance was configured.
 
 **Limits of this evidence:** PGlite has one database connection, so its queued final-place requests check the boundary but do not prove multi-connection locking. The browser test's two sessions share a temporary PGlite-backed server; that is not evidence of deployed Edge Function behaviour, a real phone browser, or real Supabase networking. Use the next test for the real local stack. No fake attendees have been sent to a real event database.
 
@@ -225,7 +225,7 @@ $env:TEST_ORGANISER_PIN = '<YOUR_LOCAL_TEST_PIN>'
 npm.cmd run test:live
 ```
 
-This script refuses any host except loopback and requires an empty database. It creates 149 fake attendees, submits two simultaneous HTTP requests for the final place, expects exactly one success, then checks cross-session attendance, repeated operations, collection rules, logout and public Data API denial. Its 150 fake records remain in the disposable local database for inspection. Reset locally afterward if needed; never reset the hosted event to clean test data.
+This script refuses any host except loopback and requires an empty database. It creates 149 fake attendees, submits two simultaneous HTTP requests for the final place, expects exactly one success, then checks cross-session attendance, repeated combined check-in, undo, logout and public Data API denial. Its 150 fake records remain in the disposable local database for inspection. Reset locally afterward if needed; never reset the hosted event to clean test data.
 
 For a manual phone check against your local stack, the preview currently binds to loopback. Use the hosted staging setup or deliberately adapt the preview binding and allowed origins for your own LAN; do not assume another device can reach `localhost` on your computer.
 
@@ -235,10 +235,10 @@ Automated tests use names beginning `Fake Student`, invented student IDs, and sy
 
 ## Deliberately outside this version
 
-No Telegram bot, automated messages, QR scanning, waitlist, student accounts, multi-event management, cancellation flow, email verification, exports, volunteer audit log, or offline queue. A single event, 150 guaranteed cups, fast check-in and explicit collection states keep the project explainable within the brief's intended scope.
+No Telegram bot, automated messages, QR scanning, waitlist, student accounts, multi-event management, cancellation flow, email verification, exports, volunteer audit log, separate collection step, or offline queue. A single event, 150 guaranteed cups, and check-in at handover keep the project focused.
 
 ## Draft: How I used AI — review before submitting
 
-> I used Codex to generate an initial implementation of the frontend, database migration, Edge Function, automated checks and setup documentation from my recruitment brief. Codex ran the automated SQL/API and Chromium checks in a disposable test environment and reviewed rendered screenshots. The generated design uses database transactions for capacity, server-side PIN verification, and separate attendance and cup-collection states.
+> I used Codex to generate an initial implementation of the frontend, database migrations, Edge Function, automated checks and setup documentation from my recruitment brief. Codex ran the automated SQL/API and Chromium checks in a disposable test environment and reviewed rendered screenshots. I requested a simpler event flow where check-in also means handing over the cup; Codex implemented the corresponding frontend, server, migration and test changes. The original generated baseline and this change were saved in separate commits.
 >
 > I reviewed the generated form code with Codex's explanations, requested removal of the data-collection and email helper text, and manually checked empty required fields, valid example inputs, and rejection of a short Telegram handle. I also linked the existing Supabase project using the CLI. Codex ran the automated checks; those checks are separate from my own manual testing. Backend deployment and verification on the hosted stack are still outstanding at this point in the review.

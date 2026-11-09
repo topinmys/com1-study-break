@@ -28,8 +28,7 @@ export function validateRegistration(input, domain = 'u.nus.edu') {
   return data;
 }
 const DB_ERRORS = {
-  DUPLICATE: 409, FULL: 409, UNAUTHORISED: 401, CHECK_IN_FIRST: 409,
-  UNDO_COLLECTION_FIRST: 409, NOT_FOUND: 404, INVALID_ACTION: 400,
+  DUPLICATE: 409, FULL: 409, UNAUTHORISED: 401, NOT_FOUND: 404, INVALID_ACTION: 400,
 };
 export function createHandler({ rpc, comparePin, env, randomToken = () => {
   return Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, '0')).join('');
@@ -97,8 +96,8 @@ export function createHandler({ rpc, comparePin, env, randomToken = () => {
       if (body.action === 'snapshot') return respond(await call('organiser_snapshot', { p_hash }));
       if (body.action === 'logout') { await call('organiser_logout', { p_hash }); return respond({ loggedOut: true }); }
       if (typeof body.id !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(body.id) ||
-          !['checkedIn', 'collected'].includes(body.field) || typeof body.value !== 'boolean') throw new ApiError('VALIDATION');
-      return respond(await call('organiser_update', { p_hash, p_id: body.id, p_field: body.field, p_value: body.value }));
+          'field' in body || typeof body.value !== 'boolean') throw new ApiError('VALIDATION');
+      return respond(await call('organiser_update', { p_hash, p_id: body.id, p_value: body.value }));
     } catch (error) {
       // Never send internal database messages or attendee input to the browser/logs.
       return respond({ error: error instanceof ApiError ? error.code : 'SERVER_UNAVAILABLE' }, error instanceof ApiError ? error.status : 503);

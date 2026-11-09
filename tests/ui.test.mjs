@@ -80,25 +80,21 @@ test('organiser controls, undo, failed saves, search, polling and second session
   const p = await page(); const second = await page(360);
   await login(p); await login(second);
   const card = p.locator('.attendee').first();
-  assert.equal(await card.locator('.cup').isDisabled(), true);
+  assert.equal(await card.locator('.cup').count(), 0);
   await card.locator('.check').click();
   await p.waitForFunction(() => document.getElementById('total-checked').textContent === '1');
-  await card.locator('.cup').click();
-  await p.waitForFunction(() => document.getElementById('total-collected').textContent === '1');
-  assert.equal(await card.locator('.check').isDisabled(), true);
   await second.locator('#search').fill('T0000001');
-  await second.waitForFunction(() => document.getElementById('total-collected').textContent === '1', null, { timeout: 12000 });
+  await second.waitForFunction(() => document.getElementById('total-checked').textContent === '1', null, { timeout: 12000 });
   assert.equal(await second.locator('#search').inputValue(), 'T0000001');
   assert.equal(await second.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   await second.screenshot({ path: 'test-results/organiser-mobile.png', fullPage: true });
-  await card.locator('.cup').click(); await p.waitForFunction(() => document.getElementById('total-collected').textContent === '0');
   await card.locator('.check').click(); await p.waitForFunction(() => document.getElementById('total-checked').textContent === '0');
   await p.route('**/functions/v1/event-api', async route => {
     if (route.request().postDataJSON().action === 'update') await route.abort(); else await route.continue();
   });
   await card.locator('.check').click(); await p.locator('#dashboard-error').waitFor({ state: 'visible' });
   assert.equal(await p.locator('#total-checked').innerText(), '0');
-  assert.equal(await card.locator('.check').innerText(), 'Check in');
+  assert.equal(await card.locator('.check').innerText(), 'Check in & give cup');
   await p.locator('#search').fill('no_such_fake_attendee');
   assert.match(await p.locator('#empty-state').innerText(), /No matches/);
   await p.locator('#logout').click(); await p.locator('#login-view').waitFor({ state: 'visible' });

@@ -54,7 +54,18 @@ test('real bcrypt PIN, hashed random sessions, logout and expired sessions', asy
   await db.exec("update private.organiser_sessions set expires_at=now()-interval '1 second'");
   assert.equal((await request({ action: 'snapshot' }, second.data.token)).status, 401);
   const id = (await db.query('select id from private.attendees limit 1')).rows[0].id;
-  assert.equal((await request({ action: 'update', id, field: 'checkedIn', value: true }, second.data.token)).status, 401);
+  assert.equal((await request({ action: 'update', id, value: true }, second.data.token)).status, 401);
+});
+test('check-in also records the cup, repeated saves are idempotent, and collection actions are rejected', async () => {
+  const login = await request({ action: 'login', pin: '87463921' });
+  assert.equal(login.status, 200);
+  const token = login.data.token;
+  const id = (await db.query('select id from private.attendees limit 1')).rows[0].id;
+  for (let n = 0; n < 2; n++) assert.equal((await request({ action: 'update', id, value: true }, token)).status, 200);
+  assert.equal((await request({ action: 'snapshot' }, token)).data.checkedIn, 1);
+  assert.equal((await request({ action: 'update', id, field: 'collected', value: true }, token)).status, 400);
+  assert.equal((await request({ action: 'update', id, value: false }, token)).status, 200);
+  assert.equal((await request({ action: 'snapshot' }, token)).data.checkedIn, 0);
 });
 test('wrong PIN requests hit persistent attempt limit', async () => {
   await db.exec('delete from private.login_limits');

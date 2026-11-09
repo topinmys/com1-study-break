@@ -25,12 +25,11 @@ test('local Supabase: final-place race, shared attendance and public isolation',
   assert.equal(first.status, 200); assert.equal(second.status, 200);
   const snapshot = await request('snapshot', {}, first.data.token); assert.equal(snapshot.data.attendees.length, 150);
   const id = snapshot.data.attendees[0].id;
-  assert.equal((await request('update', { id, field: 'collected', value: true }, first.data.token)).data.error, 'CHECK_IN_FIRST');
-  for (let i = 0; i < 2; i++) assert.equal((await request('update', { id, field: 'checkedIn', value: true }, first.data.token)).status, 200);
+  for (let i = 0; i < 2; i++) assert.equal((await request('update', { id, value: true }, first.data.token)).status, 200);
   assert.equal((await request('snapshot', {}, second.data.token)).data.checkedIn, 1);
-  for (let i = 0; i < 2; i++) assert.equal((await request('update', { id, field: 'collected', value: true }, second.data.token)).status, 200);
-  assert.equal((await request('snapshot', {}, first.data.token)).data.collected, 1);
-  assert.equal((await request('update', { id, field: 'checkedIn', value: false }, first.data.token)).data.error, 'UNDO_COLLECTION_FIRST');
+  assert.equal('collected' in (await request('snapshot', {}, first.data.token)).data, false);
+  assert.equal((await request('update', { id, value: false }, second.data.token)).status, 200);
+  assert.equal((await request('snapshot', {}, first.data.token)).data.checkedIn, 0);
   for (const path of ['attendees?select=*', 'rpc/event_capacity', 'rpc/organiser_snapshot']) {
     const res = await fetch(`${url}/rest/v1/${path}`, { method: path.includes('rpc/') ? 'POST' : 'GET', headers: { apikey: key, 'Content-Type': 'application/json' }, ...(path.includes('rpc/') ? { body: '{}' } : {}) });
     assert.ok(!res.ok, `Public database access must fail: ${path}`);

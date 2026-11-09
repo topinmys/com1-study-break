@@ -11,6 +11,7 @@ test('migration enables RLS and explicitly blocks public data and RPC access', a
     assert.equal((await db.query(`select has_table_privilege('${role}', 'private.attendees', 'SELECT') as allowed`)).rows[0].allowed, false);
   }
   for (const role of ['anon', 'authenticated']) {
+    assert.equal((await db.query(`select has_function_privilege('${role}', 'public.organiser_update(text,uuid,boolean)', 'EXECUTE') as allowed`)).rows[0].allowed, false);
     assert.equal((await db.query(`select has_function_privilege('${role}', 'public.organiser_snapshot(text)', 'EXECUTE') as allowed`)).rows[0].allowed, false);
     await db.exec(`set role ${role}`);
     await assert.rejects(db.query('select * from private.attendees'), /permission denied/);
@@ -23,29 +24,26 @@ test('normalised duplicates, constraints and persistence across independent quer
   assert.equal((await db.query('select count(*)::int as n from private.attendees')).rows[0].n, 1);
   await assert.rejects(db.query("select public.event_register('Fake Person', ' FAKE1@U.NUS.EDU ', 'OTHER123', 'fake_user')"), /DUPLICATE/);
   await assert.rejects(db.query("select public.event_register('Fake Person', 'other@u.nus.edu', ' t0000001 ', 'fake_user')"), /DUPLICATE/);
-  await assert.rejects(db.query("insert into private.attendees(full_name,email,student_id,telegram,collected_at) values('Fake Person','invalid@u.nus.edu','INVALID1','fake_user',now())"), /check constraint/);
+  await assert.rejects(db.query("insert into private.attendees(full_name,email,student_id,telegram) values('Fake Person','NOTNORMALIZED@u.nus.edu','INVALID1','fake_user')"), /check constraint/);
 });
-test('session expiry, idempotent attendance, ordering and undo rules', async () => {
+test('session expiry, idempotent combined check-in and undo', async () => {
   const hash = 'a'.repeat(64);
   await db.query('select public.organiser_session_create($1)', [hash]);
   const id = (await db.query('select id from private.attendees limit 1')).rows[0].id;
-  const update = (field, value, token = hash) => db.query('select public.organiser_update($1,$2,$3,$4)', [token, id, field, value]);
-  await assert.rejects(update('collected', true), /CHECK_IN_FIRST/);
-  await assert.rejects(update('checkedIn', true, 'b'.repeat(64)), /UNAUTHORISED/);
-  await update('checkedIn', true);
+  const update = (value, token = hash) => db.query('select public.organiser_update($1,$2,$3)', [token, id, value]);
+  await assert.rejects(update(true, 'b'.repeat(64)), /UNAUTHORISED/);
+  await assert.rejects(update(null), /INVALID_ACTION/);
+  await update(true);
   const first = (await db.query('select checked_in_at from private.attendees where id=$1', [id])).rows[0].checked_in_at;
-  await update('checkedIn', true);
+  await update(true);
   assert.deepEqual((await db.query('select checked_in_at from private.attendees where id=$1', [id])).rows[0].checked_in_at, first);
-  await update('collected', true);
-  const collected = (await db.query('select collected_at from private.attendees where id=$1', [id])).rows[0].collected_at;
-  await update('collected', true);
-  assert.deepEqual((await db.query('select collected_at from private.attendees where id=$1', [id])).rows[0].collected_at, collected);
-  await assert.rejects(update('checkedIn', false), /UNDO_COLLECTION_FIRST/);
-  await update('collected', false); await update('collected', false); await update('checkedIn', false);
+  assert.equal((await db.query('select public.organiser_snapshot($1) as s', [hash])).rows[0].s.checkedIn, 1);
+  await update(false); await update(false);
   const totals = (await db.query('select public.organiser_snapshot($1) as s', [hash])).rows[0].s;
-  assert.equal(totals.checkedIn, 0); assert.equal(totals.collected, 0);
+  assert.equal(totals.checkedIn, 0); assert.equal('collected' in totals, false);
+  assert.equal('collected_at' in totals.attendees[0], false);
   await db.query("update private.organiser_sessions set expires_at=now()-interval '1 second'");
-  await assert.rejects(update('checkedIn', true), /UNAUTHORISED/);
+  await assert.rejects(update(true), /UNAUTHORISED/);
   await assert.rejects(db.query('select public.organiser_snapshot($1)', [hash]), /UNAUTHORISED/);
 });
 test('login limits are shared, bounded, and reset after the fixed window', async () => {
