@@ -7,3 +7,6 @@ supabase/.temp/
 supabase/.branches/
 test-results/
 *.log
+.deployment/
+.vercel/
+dist/

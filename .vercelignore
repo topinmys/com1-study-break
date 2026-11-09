@@ -1,0 +1,11 @@
+.git/
+.github/
+.npm-cache/
+.deployment/
+node_modules/
+supabase/
+tests/
+test-results/
+.env*
+README.md
+dist/

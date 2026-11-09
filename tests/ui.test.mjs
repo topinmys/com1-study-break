@@ -14,7 +14,10 @@ before(async () => {
   let handler;
   server = createServer(async (req, res) => {
     if (req.method === 'GET') {
-      const source = req.url.includes('unconfigured') ? html : html.replace('https://YOUR_PROJECT_REF.supabase.co', base).replace('YOUR_SUPABASE_PUBLISHABLE_KEY', 'fake-public-key');
+      const unconfigured = req.url.includes('unconfigured');
+      // Always override deployment values so automated tests cannot reach production.
+      const source = html.replace(/supabaseUrl: '[^']*'/, `supabaseUrl: '${unconfigured ? 'https://YOUR_PROJECT_REF.supabase.co' : base}'`)
+        .replace(/publishableKey: '[^']*'/, `publishableKey: '${unconfigured ? 'YOUR_SUPABASE_PUBLISHABLE_KEY' : 'fake-public-key'}'`);
       res.writeHead(200, { 'content-type': 'text/html' }).end(source); return;
     }
     const parts = []; for await (const part of req) parts.push(part);

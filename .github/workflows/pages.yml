@@ -1,9 +1,6 @@
 name: Publish event page
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [index.html, .github/workflows/pages.yml]
 
 permissions:
   contents: read

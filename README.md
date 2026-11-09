@@ -6,7 +6,7 @@ A small event registration and organiser check-in app for an NUS Computing Club 
 
 ## Start here
 
-The code is complete, but `index.html` intentionally contains public configuration placeholders. Until you connect Supabase, it shows a clear connection message and disables registration. It never pretends to save attendees locally.
+The frontend is configured with this project's public Supabase URL and publishable key. The database migrations and Edge Function have been deployed. Frontend publishing is described below. Registrations are shared in Supabase; they are never saved as an authoritative local browser database.
 
 From this repository in PowerShell, with Node.js 22 or later installed:
 
@@ -35,7 +35,7 @@ Supabase Postgres
 - **Frontend:** a single HTML file holds markup, styles and JavaScript. Tailwind loads from its CDN as requested; custom CSS supplies the event design and remains readable if that CDN is unavailable. It uses native `fetch`, so no frontend Supabase SDK is needed.
 - **Edge Function:** the only API used by the browser. It validates all registration inputs, checks the server-configured PIN with bcrypt, rate limits logins and returns safe error codes. It does not log attendee details or PINs.
 - **Database:** shared, persistent source of truth for all devices. No attendee database or session token is kept in `localStorage` or `sessionStorage`. The organiser token stays in page memory; refreshing requires another login.
-- **Why Supabase:** PostgreSQL gives real transactions and unique constraints, while Edge Functions let a static GitHub Pages site use server-side secrets. It avoids maintaining a separate application server for a 150-person event. The tradeoff is reliance on an internet connection and an external service.
+- **Why Supabase:** PostgreSQL gives real transactions and unique constraints, while Edge Functions let a static Vercel or GitHub Pages site use server-side secrets. It avoids maintaining a separate application server for a 150-person event. The tradeoff is reliance on an internet connection and an external service.
 
 ### Files to understand first
 
@@ -48,6 +48,7 @@ Supabase Postgres
 | `supabase/.env.example` | Private configuration names, with placeholders only |
 | `tests/` | Disposable SQL, API, browser and optional local Supabase checks |
 | `.github/workflows/pages.yml` | Publishes only `index.html` |
+| `vercel.json`, `.vercelignore`, `scripts/build-site.mjs` | Vercel settings and a build that publishes only `dist/index.html` |
 
 ## Connect the hosted Supabase project
 
@@ -55,15 +56,17 @@ Use the **com1-study-break** project belonging to this repository, not a differe
 
 ### 1. Install the CLI and apply the migration
 
-Install the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started) using its supported Windows installation method. The commands below assume `supabase` is on your PATH. The CLI will ask you to sign in and enter your database password; neither belongs in this repository.
+The commands below use Supabase CLI v3 through `npx` on Windows. `npx` downloads the CLI if needed. Sign in using the CLI's interactive login; credentials do not belong in this repository. See the [Supabase CLI guide](https://supabase.com/docs/guides/local-development/cli/getting-started).
 
 ```powershell
-supabase login
-supabase link --project-ref <YOUR_PROJECT_REF>
-supabase db push
+npx.cmd supabase login
+npx.cmd supabase link --project-ref <YOUR_PROJECT_REF>
+npx.cmd supabase db push --remote --yes
 ```
 
 Replace `<YOUR_PROJECT_REF>` rather than copying the angle brackets. `db push` applies the versioned migration; do not paste random copies into the SQL editor and then also apply it with the CLI. See [Supabase database migrations](https://supabase.com/docs/guides/deployment/database-migrations).
+
+For the initial launch, direct PostgreSQL login from the CLI stalled. Codex used the authenticated management API to apply the same two migration files in one transaction and record both versions in `supabase_migrations.schema_migrations`. No attendee rows were inserted. Future `db push` commands should see those versions as applied. Keep both migration files; add a new migration for future schema changes.
 
 Keep **Data API enabled**, **automatically expose new tables disabled**, and **automatic RLS enabled**. The architecture does not depend on automatic table exposure:
 
@@ -95,20 +98,22 @@ Edit `supabase/.env.local` in your editor:
 ```dotenv
 ORGANISER_PIN_HASH='<YOUR_GENERATED_BCRYPT_HASH>'
 RATE_LIMIT_SECRET=<YOUR_RANDOM_SECRET>
-ALLOWED_ORIGINS=http://localhost:4173,https://topinmys.github.io
+ALLOWED_ORIGINS=http://localhost:4173,https://<YOUR_VERCEL_PROJECT>.vercel.app
 STUDENT_EMAIL_DOMAIN=u.nus.edu
 ```
 
-These examples contain placeholders only. Allowed origins have a scheme and host, **no trailing slash or repository path**. The GitHub Pages origin is `https://topinmys.github.io`, even though the site's path is `/com1-study-break/`. Add your custom-domain origin if you use one. `http://127.0.0.1:4173` is a different origin from `http://localhost:4173`.
+These examples contain placeholders only. Allowed origins have a scheme and host, **no trailing slash or repository path**. Use the exact stable Vercel production origin shown after deployment. Add a custom-domain origin if you use one. For optional GitHub Pages hosting, add `https://topinmys.github.io`. `http://127.0.0.1:4173` is a different origin from `http://localhost:4173`.
 
 Upload secrets and deploy:
 
 ```powershell
-supabase secrets set --env-file supabase/.env.local
-supabase functions deploy event-api --no-verify-jwt
+npx.cmd supabase secrets set --env-file supabase/.env.local --yes
+npx.cmd supabase functions deploy event-api --use-api --no-verify-jwt --yes
 ```
 
 The hosted runtime supplies `SUPABASE_URL` and private keys. The transport prefers the current `SUPABASE_SECRET_KEYS.default` entry and falls back to `SUPABASE_SECRET_KEY` or the legacy `SUPABASE_SERVICE_ROLE_KEY` for local/older setups. These privileged keys appear only in server-side calls; **never paste them into the frontend or a committed file**. `.env.local` is ignored by Git. See the [Supabase environment variable guidance](https://supabase.com/docs/guides/functions/secrets).
+
+For the initial deployment, Codex generated a random eight-digit organiser PIN. Its usable value is in the ignored local `.env.organiser-access` file. The server receives only its bcrypt hash, plus a separate random rate-limit secret. The PIN file is also excluded from Vercel uploads. To choose a replacement PIN, use the hash helper above and update the server secrets.
 
 `verify_jwt = false` is intentional: students have no Supabase Auth account, and new publishable keys are not user JWTs. The function has public capacity, registration and PIN-login operations; organiser operations require the custom short-lived session. A publishable key or allowed origin is not organiser authentication. See [Supabase function auth headers](https://supabase.com/docs/guides/functions/auth-headers).
 
@@ -130,16 +135,31 @@ To change the permitted email domain, update **both** `CONFIG.emailDomain` and t
 
 Start the preview again. Capacity should now load from Supabase. Confirm configuration through capacity and organiser login; do not create fake reservations in the real event database. Test registrations belong in the disposable local setup below.
 
-## Publish to GitHub Pages
+## Publish to Vercel
+
+Vercel hosts the frontend; Supabase hosts the database and Edge Function. No paid hosting upgrade is needed for this configuration on the selected Hobby workspace.
+
+```powershell
+npm.cmd run build
+npx.cmd vercel login
+npx.cmd vercel link --project com1-study-break
+npx.cmd vercel deploy --prod --yes
+```
+
+`vercel.json` disables framework detection and dependency installation, runs the native Node build script, and publishes only `dist/`. The build copies the single HTML file there. `.vercelignore` excludes backend code, private settings, tests and local artifacts from uploads. The output contains no server secrets. The project is linked locally through ignored `.vercel/` metadata. See [Vercel CLI deployment](https://vercel.com/docs/cli/deploy).
+
+After deploying, add the returned stable production origin to `ALLOWED_ORIGINS` in `supabase/.env.local`, then upload secrets again if that origin changed. Verify capacity and organiser login through the production URL. Do not seed fake attendees in the real event database.
+
+## Optional: publish to GitHub Pages
 
 1. Configure and test the backend first, then replace the public placeholders in `index.html`.
 2. Commit and push this repository to `topinmys/com1-study-break`. Review `git status` first; private `.env` files must remain ignored.
 3. In the repository, open **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-4. Run **Actions → Publish event page → Run workflow**. Later pushes to `main` that change the frontend publish automatically.
+4. Run **Actions → Publish event page → Run workflow**. This optional workflow runs manually; pushing commits alone does not start it.
 5. When the action finishes, visit **https://topinmys.github.io/com1-study-break/**. That is the expected URL after deployment, not a claim that the site is already live.
 6. Check capacity and organiser login from the deployed origin. In a separate local test environment, use two devices or two browser sessions to practise check-in and undo before the event.
 
-The workflow uploads **only `index.html`**. No server environment files, tests, attendee records or Node packages are included in the Pages artifact. This uses [GitHub's supported custom Pages workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). No code has been pushed or published by this implementation session.
+The workflow uploads **only `index.html`**. No server environment files, tests, attendee records or Node packages are included in the Pages artifact. This uses [GitHub's supported custom Pages workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Vercel is the selected primary host; GitHub Pages remains optional.
 
 ## The important rules, explained for an interview
 
@@ -197,7 +217,7 @@ npm.cmd run test:ui
 
 `test:ui` drives Chromium at desktop and narrow phone sizes. It uses the actual HTML, handler and temporary SQL database over local HTTP. It checks registration and persistence after page refresh, duplicates, safe rendering of HTML-like names, network failures without false confirmations, capacity loss, organiser actions/undo, search, a second session seeing polling updates, logout and no horizontal overflow. It also verifies the unconfigured state. Screenshots are written under ignored `test-results/`. The tests block Tailwind's CDN to verify the CSS fallback.
 
-**Verification during implementation:** 14 SQL/API tests and 5 browser tests passed. The Edge Function entry point passed `deno check --node-modules-dir=manual supabase/functions/event-api/index.ts`. Desktop and mobile screenshots were visually reviewed. The preview returned the frontend successfully and refused a request for a server configuration file. The project owner subsequently linked the hosted Supabase project with the CLI; the backend has not yet been deployed. The optional local Supabase test was skipped because no local instance was configured.
+**Verification during implementation:** 15 SQL/API tests and 5 browser tests passed. The Edge Function entry point passed `deno check --node-modules-dir=manual supabase/functions/event-api/index.ts`. Desktop and mobile screenshots were visually reviewed. The preview returned the frontend successfully and refused a request for a server configuration file. The project owner linked the hosted Supabase project with the CLI. Codex subsequently deployed both migrations and the Edge Function, and verified hosted capacity, organiser login, the empty dashboard, logout/session invalidation, CORS, and denial of public database access without inserting attendees. The optional local Supabase test was skipped because no local instance was configured.
 
 **Limits of this evidence:** PGlite has one database connection, so its queued final-place requests check the boundary but do not prove multi-connection locking. The browser test's two sessions share a temporary PGlite-backed server; that is not evidence of deployed Edge Function behaviour, a real phone browser, or real Supabase networking. Use the next test for the real local stack. No fake attendees have been sent to a real event database.
 
@@ -206,14 +226,14 @@ npm.cmd run test:ui
 Use a disposable local instance and Docker Desktop supported by the CLI. Do not point these tests at your hosted event. In this repository:
 
 ```powershell
-supabase start
-supabase db reset --local
+npx.cmd supabase start
+npx.cmd supabase db reset
 ```
 
-`db reset --local` erases **only the local development database** and reapplies migrations. The hosted project linked earlier is separate. Create `supabase/.env.local` as above using a separate test PIN/hash, then in another terminal leave this running:
+`db reset` with no remote target erases **only the local development database** and reapplies migrations. The hosted project linked earlier is separate. Create `supabase/.env.local` as above using a separate test PIN/hash, then in another terminal leave this running:
 
 ```powershell
-supabase functions serve event-api --env-file supabase/.env.local --no-verify-jwt
+npx.cmd supabase functions serve event-api --env-file supabase/.env.local --no-verify-jwt
 ```
 
 Get the local API URL and public/anon key from `supabase status` (do not copy the service-role key). In the test terminal:
@@ -241,4 +261,4 @@ No Telegram bot, automated messages, QR scanning, waitlist, student accounts, mu
 
 > I used Codex to generate an initial implementation of the frontend, database migrations, Edge Function, automated checks and setup documentation from my recruitment brief. Codex ran the automated SQL/API and Chromium checks in a disposable test environment and reviewed rendered screenshots. I requested a simpler event flow where check-in also means handing over the cup; Codex implemented the corresponding frontend, server, migration and test changes. The original generated baseline and this change were saved in separate commits.
 >
-> I reviewed the generated form code with Codex's explanations, requested removal of the data-collection and email helper text, and manually checked empty required fields, valid example inputs, and rejection of a short Telegram handle. I also linked the existing Supabase project using the CLI. Codex ran the automated checks; those checks are separate from my own manual testing. Backend deployment and verification on the hosted stack are still outstanding at this point in the review.
+> I reviewed the generated form code with Codex's explanations, requested removal of the data-collection and email helper text, and manually checked empty required fields, valid example inputs, and rejection of a short Telegram handle. I also linked the existing Supabase project using the CLI. Codex ran the automated checks; those checks are separate from my own manual testing. After I authorised routine commits and deployment, Codex deployed the Supabase backend and verified the public capacity and authenticated empty-dashboard paths without creating fake event attendees. A real multi-connection final-place race remains unverified.
