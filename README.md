@@ -1,6 +1,6 @@
 # COM1 Study Break & Bubble Tea
 
-A small event registration and organiser check-in app for an NUS Computing Club recruitment submission. Cream, sage and pink styling, a mobile layout, and inline SVG bubble-tea illustrations. No build step for the website.
+A small event registration and organiser check-in app for an NUS Computing Club recruitment submission. Cream, sage and pink styling, a mobile layout, and inline SVG bubble-tea illustrations. Single-page frontend with no frontend framework.
 
 **Live website:** [com1-study-break.vercel.app](https://com1-study-break.vercel.app)
 
@@ -17,7 +17,7 @@ npm.cmd ci
 npm.cmd run preview
 ```
 
-Open **http://localhost:4173**. Stop the preview with Ctrl+C. The preview serves only `index.html`, so private configuration files cannot be downloaded from it. You can preview the appearance without Supabase. Browser tests run a real copy of the handler against a temporary test database.
+Open **http://localhost:4173**. Stop the preview with Ctrl+C. The preview serves only `index.html` and the supplied logo, so private configuration files cannot be downloaded from it. You can preview the appearance without Supabase. Browser tests run a real copy of the handler against a temporary test database.
 
 ## How the pieces work together
 
@@ -49,8 +49,9 @@ Supabase Postgres
 | `supabase/functions/event-api/index.ts` | Thin Deno entry point; calls the Supabase Data API |
 | `supabase/.env.example` | Private configuration names, with placeholders only |
 | `tests/` | Disposable SQL, API, browser and optional local Supabase checks |
-| `.github/workflows/pages.yml` | Publishes only `index.html` |
-| `vercel.json`, `.vercelignore`, `scripts/build-site.mjs` | Vercel settings and a build that publishes only `dist/index.html` |
+| `assets/computing-club-logo.png` | Original transparent Computing Club logo supplied by the project owner |
+| `.github/workflows/pages.yml` | Publishes the HTML and logo |
+| `vercel.json`, `.vercelignore`, `scripts/build-site.mjs` | Vercel settings and a build that publishes the frontend HTML and logo under `dist/` |
 
 ## Connect the hosted Supabase project
 
@@ -148,7 +149,7 @@ npx.cmd vercel link --project com1-study-break
 npx.cmd vercel deploy --prod --yes
 ```
 
-`vercel.json` disables framework detection and dependency installation, runs the native Node build script, and publishes only `dist/`. The build copies the single HTML file there. `.vercelignore` excludes backend code, private settings, tests and local artifacts from uploads. The output contains no server secrets. The project is linked locally through ignored `.vercel/` metadata. See [Vercel CLI deployment](https://vercel.com/docs/cli/deploy).
+`vercel.json` disables framework detection and dependency installation, runs the native Node build script, and publishes only `dist/`. The build copies the single HTML file and the supplied logo there. `.vercelignore` excludes backend code, private settings, tests and local artifacts from uploads. The output contains no server secrets. The project is linked locally through ignored `.vercel/` metadata. See [Vercel CLI deployment](https://vercel.com/docs/cli/deploy).
 
 After deploying, add the returned stable production origin to `ALLOWED_ORIGINS` in `supabase/.env.local`, then upload secrets again if that origin changed. Verify capacity and organiser login through the production URL. Do not seed fake attendees in the real event database.
 
@@ -163,7 +164,7 @@ The initial production deployment was checked anonymously in Chromium at a 360px
 5. When the action finishes, visit **https://topinmys.github.io/com1-study-break/**. That is the expected URL after deployment, not a claim that the site is already live.
 6. Check capacity and organiser login from the deployed origin. In a separate local test environment, use two devices or two browser sessions to practise check-in and undo before the event.
 
-The workflow uploads **only `index.html`**. No server environment files, tests, attendee records or Node packages are included in the Pages artifact. This uses [GitHub's supported custom Pages workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Vercel is the selected primary host; GitHub Pages remains optional.
+The workflow uploads **only `index.html` and the supplied logo**. No server environment files, tests, attendee records or Node packages are included in the Pages artifact. This uses [GitHub's supported custom Pages workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Vercel is the selected primary host; GitHub Pages remains optional.
 
 ## The important rules, explained for an interview
 
@@ -265,4 +266,4 @@ No Telegram bot, automated messages, QR scanning, waitlist, student accounts, mu
 
 > I used Codex to generate an initial implementation of the frontend, database migrations, Edge Function, automated checks and setup documentation from my recruitment brief. Codex ran the automated SQL/API and Chromium checks in a disposable test environment and reviewed rendered screenshots. I requested a simpler event flow where check-in also means handing over the cup; Codex implemented the corresponding frontend, server, migration and test changes. The original generated baseline and this change were saved in separate commits.
 >
-> I reviewed the generated form code with Codex's explanations, requested removal of the data-collection and email helper text, and manually checked empty required fields, valid example inputs, and rejection of a short Telegram handle. I also linked the existing Supabase project using the CLI. Codex ran the automated checks; those checks are separate from my own manual testing. After I authorised routine commits and deployment, Codex deployed the Supabase backend and verified the public capacity and authenticated empty-dashboard paths without creating fake event attendees. A real multi-connection final-place race remains unverified.
+> I reviewed the generated form code with Codex's explanations, requested removal of the data-collection and email helper text, and manually checked empty required fields, valid example inputs, and rejection of a short Telegram handle. I also linked the existing Supabase project using the CLI, supplied the Computing Club logo, and requested clearer login spacing and a correction to the straw illustration. Codex implemented those visual changes. Codex ran the automated checks; those checks are separate from my own manual testing. After I authorised routine commits and deployment, Codex deployed the Supabase backend and verified the public capacity and authenticated empty-dashboard paths without creating fake event attendees. A real multi-connection final-place race remains unverified.

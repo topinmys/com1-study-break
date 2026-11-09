@@ -22,8 +22,9 @@ jobs:
       - uses: actions/configure-pages@v5
       - name: Package only the public frontend
         run: |
-          mkdir public-site
+          mkdir -p public-site/assets
           cp index.html public-site/index.html
+          cp assets/computing-club-logo.png public-site/assets/computing-club-logo.png
       - uses: actions/upload-pages-artifact@v4
         with:
           path: public-site

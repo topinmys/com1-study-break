@@ -13,6 +13,9 @@ before(async () => {
   const env = { ALLOWED_ORIGINS: '', ORGANISER_PIN_HASH: await bcrypt.hash(pin, 4), RATE_LIMIT_SECRET: 'fake-test-secret' };
   let handler;
   server = createServer(async (req, res) => {
+    if (req.method === 'GET' && req.url === '/assets/computing-club-logo.png') {
+      res.writeHead(200, { 'content-type': 'image/png' }).end(await readFile(new URL('../assets/computing-club-logo.png', import.meta.url))); return;
+    }
     if (req.method === 'GET') {
       const unconfigured = req.url.includes('unconfigured');
       // Always override deployment values so automated tests cannot reach production.
@@ -52,6 +55,7 @@ async function login(page) {
 }
 test('phone registration, safe text rendering, refresh persistence and duplicate handling', async () => {
   const p = await page(360);
+  assert.equal(await p.locator('.brand-logo').evaluate(img => img.complete && img.naturalWidth > 0), true);
   assert.equal(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   await p.screenshot({ path: 'test-results/student-mobile.png', fullPage: true });
   const name = '<img src=x onerror=alert(1)>';
