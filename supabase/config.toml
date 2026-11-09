@@ -1,0 +1,11 @@
+project_id = "com1-study-break"
+
+[api]
+enabled = true
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[functions.event-api]
+# Students have no Supabase Auth account. The handler checks organiser sessions.
+verify_jwt = false
