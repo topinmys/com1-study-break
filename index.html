@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#faf6ee">
+  <meta name="description" content="Take a well-earned pause at COM1. Register for the Computing Club study break and reserve one cup of bubble tea.">
+  <title>COM1 Study Break & Bubble Tea</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--cream:#faf6ee;--ink:#303c35;--muted:#626b60;--green:#365b46;--pink:#f2dce1;--line:#dedfd2;--berry:#875167}
+    *{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.55 'Segoe UI',Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.65}button,input,a{outline-offset:4px}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #875167}button{min-height:48px}a{color:var(--green)}[hidden]{display:none!important}
+    .shell{max-width:1160px;margin:auto;padding:0 36px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:26px 0;border-bottom:1px solid var(--line)}.brand{display:flex;gap:11px;align-items:center;font-size:13px;font-weight:750;letter-spacing:1.3px}.brand-mark{border:1px solid var(--green);border-radius:50%;width:36px;height:36px;display:grid;place-items:center;font:22px Georgia,serif;background:#e6ebdc}.quiet{border:1px solid #c7cebf;border-radius:100px;padding:9px 18px;background:transparent;color:var(--ink);font-size:13px;font-weight:600}.eyebrow{text-transform:uppercase;letter-spacing:2px;font-size:11px;font-weight:750}.page-intro{margin:38px 0 27px;display:flex;gap:12px;align-items:center}.dot{width:7px;height:7px;border-radius:50%;background:#6c8255}.intro-label{color:var(--muted);font-size:12px}.layout{display:grid;grid-template-columns:1.04fr 1fr;gap:64px;align-items:start}.story{padding-top:13px}h1,h2,h3,p{margin-top:0}h1{font:normal clamp(46px,5.1vw,66px)/1.04 Georgia,'Times New Roman',serif;letter-spacing:-2.4px;margin-bottom:23px}h1 em{color:var(--berry);font-weight:normal}h2{font:normal 30px/1.15 Georgia,serif;letter-spacing:-.6px}.lede{max-width:365px;color:var(--muted);font-size:16px;line-height:1.75}.event-facts{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0 0}.pill{font-size:12px;border:1px solid #d1d6c5;border-radius:100px;padding:8px 13px;background:#eef0e5}.tea-scene{height:210px;position:relative;margin:17px 0 11px;max-width:420px}.tea-scene svg{width:100%;height:100%}.small-note{font-size:12px;color:var(--muted)}.terms{padding:17px 0;border-top:1px solid var(--line);display:flex;gap:13px;max-width:440px}.terms-icon{font-size:21px;color:var(--green)}.terms strong{font-size:13px}.terms p{font-size:12px;color:var(--muted);margin:3px 0 0}.card{background:#fffefa;border:1px solid #e0dfd4;border-radius:24px;padding:29px 30px;box-shadow:0 10px 40px #47482d06}.card-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:20px}.tag{background:#eee5f1;color:#71527b;font-size:10px;font-weight:750;letter-spacing:1.1px;padding:6px 10px;border-radius:6px;text-transform:uppercase}.capacity-text{font-size:12px;font-weight:600;color:var(--muted)}.progress-track{height:5px;background:#eceee5;border-radius:10px;overflow:hidden;margin:0 0 24px}.progress-track span{display:block;height:100%;background:#7b966a;transition:width .3s;width:0}.card h2{margin-bottom:8px}.card-sub{color:var(--muted);font-size:13px;margin-bottom:23px}.field{margin-bottom:16px}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}.optional-note{font-weight:400;color:var(--muted)}input{width:100%;border:1px solid #d9ddd1;border-radius:10px;background:#fffefa;color:var(--ink);min-height:48px;padding:11px 13px;font-size:14px;transition:border-color .15s}input:focus{border-color:var(--green)}input::placeholder{color:#92988e}.field small{display:block;color:var(--muted);font-size:11px;margin-top:5px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}.privacy{font-size:11px;line-height:1.7;color:var(--muted);padding:13px 15px;background:#f3f4ec;border-radius:10px;margin:4px 0 19px}.primary{width:100%;background:var(--green);border:1px solid var(--green);border-radius:12px;color:#fff;padding:13px 18px;font-size:14px;font-weight:650}.primary:hover{background:#294c38}.button-row{display:flex;gap:10px;flex-wrap:wrap}.button-row>*{flex:1}.under-button{font-size:10px;text-align:center;color:var(--muted);margin:11px 0 0}.feedback{font-size:13px;padding:12px 14px;border-radius:10px;background:#f7e7df;color:#813c2b;margin:12px 0;border:1px solid #e7cbbf}.notice{background:#edf1e6;color:#3b5435;border-color:#cdd8bc}.footer{margin-top:48px;border-top:1px solid var(--line);padding:20px 0 25px;display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:11px}.footer span:last-child{font-style:italic}.center-card{max-width:450px;margin:62px auto}.back{background:none;border:0;color:var(--green);padding:0;font-size:12px;margin-bottom:20px}.success-seal{display:grid;place-items:center;width:60px;height:60px;background:#e8eedf;border-radius:50%;font-size:28px;margin-bottom:25px}.ticket{border:1px dashed #b5c1a5;border-radius:14px;padding:19px;background:#f4f6ec;margin:23px 0}.ticket p{margin:5px 0;font-size:13px}.reference{font-family:monospace;overflow-wrap:anywhere;font-size:11px}.dashboard{padding-top:34px}.dashboard-heading{display:flex;align-items:center;justify-content:space-between;gap:20px}.dashboard-heading h1{font-size:44px;margin:7px 0 8px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:25px 0}.stat{background:#fffefa;border:1px solid var(--line);border-radius:17px;padding:20px}.stat:nth-child(2){background:#eaf0e4}.stat:nth-child(3){background:#f3e3e7}.stat span{display:block;color:var(--muted);font-size:12px}.stat strong{font:normal 38px Georgia,serif;display:block;margin-top:5px}.stat small{font:14px 'Segoe UI',sans-serif;color:var(--muted)}.toolbar{display:flex;align-items:end;gap:16px;margin:25px 0 20px}.toolbar .field{flex:1;margin:0}.sync{color:var(--muted);font-size:11px;min-height:22px}.attendee{padding:20px;border:1px solid var(--line);background:#fffefa;border-radius:18px;margin-bottom:13px;display:grid;grid-template-columns:1fr 1fr;gap:20px}.attendee h3{font-weight:650;font-size:17px;margin:0 0 4px;overflow-wrap:anywhere}.attendee .identity{font-size:12px;color:var(--muted);margin-bottom:9px}.attendee details{font-size:12px;overflow-wrap:anywhere}.attendee details p{margin:7px 0;color:var(--muted)}.attendance-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}.action{border-radius:10px;border:1px solid #b9c7ae;padding:10px;background:#eef3e7;color:#355233;width:100%;font-size:13px;font-weight:650}.action.done{background:#365b46;border-color:#365b46;color:white}.action.cup{background:#f6e9ed;border-color:#dfbdc9;color:#76465b}.action.cup.done{background:#875167;color:white}.action small{display:block;font-size:10px;font-weight:400}.control-help{font-size:10px;color:var(--muted);margin:6px 0 0}.empty{text-align:center;padding:42px 20px;border:1px dashed #c6cebc;border-radius:17px;color:var(--muted)}.list-count{font-size:12px;color:var(--muted);margin-bottom:13px}.logout{white-space:nowrap}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:850px){.layout{gap:28px}.shell{padding:0 24px}.card{padding:25px 22px}h1{font-size:49px}.pair{grid-template-columns:1fr;gap:0}.tea-scene{height:180px}.attendee{grid-template-columns:1fr}}
+    @media(max-width:620px){.shell{padding:0 20px}.topbar{padding:18px 0;gap:8px}.brand{font-size:10px;letter-spacing:.9px;gap:7px}.brand-mark{width:29px;height:29px;font-size:18px}.quiet{font-size:11px;padding:8px 12px}.page-intro{margin:25px 0 20px}.layout{grid-template-columns:1fr;gap:24px}.story{padding-top:0}h1{font-size:51px;max-width:380px}.lede{max-width:100%;font-size:14px;margin-bottom:16px}.event-facts{margin-top:17px}.tea-scene{height:165px;margin:5px auto 4px;max-width:310px}.terms{max-width:none;padding:12px 0}.card{padding:24px 22px}.pair{grid-template-columns:1fr 1fr;gap:12px}.footer{margin-top:30px;flex-direction:column;gap:4px}.center-card{margin:30px auto}.dashboard-heading{align-items:start}.dashboard-heading h1{font-size:34px}.stats{gap:8px}.stat{padding:14px 10px}.stat span{font-size:10px}.stat strong{font-size:30px}.stat small{font-size:11px}.toolbar{gap:10px}.attendee{padding:17px;gap:15px}.attendance-controls{gap:10px}}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+    @media(max-width:620px){input{font-size:16px}.intro-label{display:none}}
+    @media(max-width:380px){.pair{grid-template-columns:1fr;gap:0}}
+  </style>
+</head>
+<body class="antialiased">
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">c.</span><span>NUS COMPUTING CLUB</span></div>
+      <button id="organiser-access" class="quiet" type="button">Organiser access ↗</button>
+    </header>
+
+    <main class="relative">
+      <section id="student-view" aria-label="Event registration">
+        <div class="page-intro"><span class="dot" aria-hidden="true"></span><span class="eyebrow">The study-break edit</span><span class="intro-label">/ made for a little pause</span></div>
+        <div class="layout">
+          <div class="story">
+            <h1>COM1 Study<br>Break &<br><em>Bubble Tea.</em></h1>
+            <p class="lede">Close the tabs. Bring your friends.<br>A little breather, a good chat, and a cup on us.</p>
+            <div class="event-facts"><span class="pill">⌖ &nbsp; COM1 Foyer</span><span class="pill">◷ &nbsp; Thursday, 7–9 PM</span></div>
+            <p class="small-note" style="margin:8px 0 0">Calendar date to be confirmed.</p>
+            <div class="tea-scene" aria-hidden="true">
+              <svg viewBox="0 0 430 225" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="218" cy="199" rx="151" ry="13" fill="#e8e9dc"/>
+                <path d="M42 109c25-50 97-55 130-12s108 63 176 5" stroke="#d9dfca" stroke-dasharray="4 8"/>
+                <path d="m338 48 4 11 11 4-11 4-4 11-4-11-11-4 11-4 4-11Z" fill="#b5c5a0"/>
+                <path d="m79 54 3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8Z" fill="#d8b2c0"/>
+                <g transform="rotate(-12 177 133)"><path d="m151 27 12-4 36 94-12 4-36-94Z" fill="#875167"/>
+                <path d="m119 81 17 106c2 15 84 15 86 0l17-106" fill="#efd4bd" stroke="#536746" stroke-width="2.5"/>
+                <path d="m124 112 12 75c2 15 84 15 86 0l12-75c-31 11-81 11-110 0Z" fill="#e0b99b"/>
+                <ellipse cx="179" cy="81" rx="61" ry="14" fill="#f5e9d6" stroke="#536746" stroke-width="2.5"/>
+                <path d="m164 60 9 24" stroke="#875167" stroke-width="12"/>
+                <g fill="#5d4543"><circle cx="153" cy="176" r="7"/><circle cx="175" cy="181" r="7"/><circle cx="198" cy="177" r="7"/><circle cx="163" cy="158" r="7"/><circle cx="188" cy="158" r="7"/><circle cx="210" cy="162" r="6"/></g>
+                <path d="M165 132v3m28-3v3" stroke="#536746" stroke-width="3" stroke-linecap="round"/><path d="M174 138c3 5 7 5 10 0" stroke="#536746" stroke-width="2" stroke-linecap="round"/>
+                <ellipse cx="157" cy="141" rx="6" ry="3" fill="#d49995"/><ellipse cx="201" cy="141" rx="6" ry="3" fill="#d49995"/></g>
+                <g transform="rotate(12 281 146)"><path d="m286 59 11 1-7 70-11-1 7-70Z" fill="#718660"/>
+                <path d="m241 113 11 77c2 12 61 12 63 0l11-77" fill="#eddae5" stroke="#795a6c" stroke-width="2.5"/>
+                <ellipse cx="283" cy="113" rx="43" ry="10" fill="#f5eaf0" stroke="#795a6c" stroke-width="2.5"/>
+                <path d="m284 98-2 16" stroke="#718660" stroke-width="11"/>
+                <g fill="#795a6c"><circle cx="265" cy="181" r="5"/><circle cx="281" cy="185" r="5"/><circle cx="299" cy="182" r="5"/><circle cx="273" cy="167" r="5"/><circle cx="291" cy="167" r="5"/></g>
+                <path d="M271 146v2m21-2v2m-16 6c3 4 6 4 9 0" stroke="#795a6c" stroke-width="2" stroke-linecap="round"/></g>
+                <text x="35" y="174" fill="#7a896c" font-size="13" font-family="Georgia,serif" font-style="italic" transform="rotate(-12 35 174)">sip, sip, hooray.</text>
+              </svg>
+            </div>
+            <div class="terms"><span class="terms-icon" aria-hidden="true">♡</span><div><strong>One student. One reserved cup.</strong><p>150 places · Registration required · No walk-ins.<br>Your successful registration guarantees one cup.</p></div></div>
+          </div>
+
+          <div class="card" id="registration-card">
+            <div class="card-top"><span class="tag">Your well-earned break</span><span id="capacity" class="capacity-text" role="status">Checking places…</span></div>
+            <div class="progress-track" aria-hidden="true"><span id="capacity-bar"></span></div>
+            <div id="capacity-error" class="feedback" role="alert" hidden></div>
+            <button id="capacity-retry" class="quiet" hidden type="button">Try connecting again</button>
+            <div id="full-state" hidden><h2>Every cup has a name.</h2><p class="feedback notice">Fully booked. Registered attendees only; no walk-ins.</p></div>
+            <div id="registration-content">
+              <h2>Save your spot.</h2><p class="card-sub">A few details, then back to your day.</p>
+              <form id="registration-form">
+                <div class="field"><label for="full-name">Full name</label><input id="full-name" name="fullName" placeholder="What should we call you?" autocomplete="name" required minlength="2" maxlength="100"></div>
+                <div class="field"><label for="email">NUS student email</label><input id="email" name="email" type="email" placeholder="you@u.nus.edu" autocomplete="email" required maxlength="254"></div>
+                <div class="pair">
+                  <div class="field"><label for="student-id">Student ID</label><input id="student-id" name="studentId" placeholder="e.g. A0123456B" autocapitalize="characters" spellcheck="false" required pattern="[A-Za-z0-9]{6,20}" maxlength="20" aria-describedby="id-help"><small id="id-help">6–20 letters or numbers.</small></div>
+                  <div class="field"><label for="telegram">Telegram handle</label><input id="telegram" name="telegram" placeholder="@yourhandle" autocomplete="off" autocapitalize="none" spellcheck="false" required pattern="@?[A-Za-z][A-Za-z0-9_]{4,31}" maxlength="33" aria-describedby="telegram-help"><small id="telegram-help">With or without @ · 5–32 characters.</small></div>
+                </div>
+                <div id="registration-error" class="feedback" role="alert" hidden></div>
+                <button id="register-button" class="primary" disabled type="submit">Reserve my cup &nbsp; →</button>
+                <p class="under-button">One registration per student. Please only reserve if you can join us.</p>
+              </form>
+            </div>
+            <div id="success-state" hidden tabindex="-1">
+              <div class="success-seal" aria-hidden="true">✓</div><h2>One cup, just for you.</h2>
+              <p id="success-name" class="card-sub"></p><p>Your registration is saved. <strong>One cup is reserved for you.</strong></p>
+              <div class="ticket"><span class="eyebrow">Your study break</span><p><strong>COM1 Study Break & Bubble Tea</strong></p><p>COM1 Foyer · Thursday, 7–9 PM</p><p>Calendar date to be confirmed.</p><p>Give your name or student ID to an organiser when you arrive.</p></div>
+              <p class="small-note">You can save a screenshot of this confirmation. Keep your reference private.</p><p id="confirmation-reference" class="reference"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="login-view" hidden aria-labelledby="login-title">
+        <div class="card center-card"><button class="back" id="back-to-event" type="button">← Back to the event</button><span class="tag">For the door crew</span><h2 id="login-title" style="margin-top:22px">Hello, organiser.</h2><p class="card-sub">Enter the shared organiser PIN to manage arrivals and cup collection.</p>
+          <form id="login-form"><div class="field"><label for="pin">Organiser PIN</label><input id="pin" type="password" inputmode="numeric" autocomplete="off" required pattern="[0-9]{6,12}" minlength="6" maxlength="12" aria-describedby="pin-help"><small id="pin-help">6–12 digits. Ask the event lead for access.</small></div><div id="login-error" class="feedback" role="alert" hidden></div><button id="login-button" class="primary" type="submit">Open check-in desk →</button></form>
+          <p class="small-note" style="margin:17px 0 0">Sessions last two hours. Refreshing this page signs you out on this device. Keep the PIN and attendee details private.</p>
+        </div>
+      </section>
+
+      <section id="dashboard-view" class="dashboard" hidden aria-labelledby="dashboard-title">
+        <div class="dashboard-heading"><div><span class="eyebrow">COM1 · Organiser desk</span><h1 id="dashboard-title">Welcome to the break.</h1><p class="small-note">Thursday, 7–9 PM · COM1 Foyer · Date to be confirmed</p></div><button id="logout" class="quiet logout" type="button">Log out ↗</button></div>
+        <div class="stats" aria-label="Saved attendance totals"><div class="stat"><span>Registrations</span><strong><b id="total-registered">—</b> <small>/ 150</small></strong></div><div class="stat"><span>Checked in</span><strong id="total-checked">—</strong></div><div class="stat"><span>Cups collected</span><strong id="total-collected">—</strong></div></div>
+        <div id="dashboard-error" class="feedback" role="alert" hidden></div>
+        <div class="toolbar"><div class="field"><label for="search">Find an attendee</label><input type="search" id="search" placeholder="Search full name or student ID" autocomplete="off"></div><button id="refresh-dashboard" class="quiet" type="button">Refresh ↻</button></div>
+        <p id="sync-status" class="sync" role="status">Loading saved attendance…</p><p class="small-note">Check in first, then hand over the cup and record collection. To undo check-in, undo collection first.</p>
+        <p id="list-count" class="list-count" aria-live="polite"></p><div id="attendee-list"></div><div id="empty-state" class="empty" hidden></div>
+      </section>
+    </main>
+    <footer class="footer"><span>A little something from NUS Computing Club.</span><span>Less debugging. More bubble tea.</span></footer>
+  </div>
+  <script>
+    // PUBLIC configuration only. Never paste a secret/service-role key here.
+    const CONFIG = {
+      supabaseUrl: 'https://YOUR_PROJECT_REF.supabase.co',
+      publishableKey: 'YOUR_SUPABASE_PUBLISHABLE_KEY',
+      emailDomain: 'u.nus.edu',
+    };
+    const $ = id => document.getElementById(id);
+    const messages = {
+      VALIDATION: 'Please check your details and use the required student email domain.',
+      DUPLICATE: 'That email or student ID is already registered. One registration per student. If this was not you, contact the event organisers.',
+      FULL: 'Fully booked. Registered attendees only; no walk-ins.',
+      INVALID_PIN: 'That PIN was not accepted. Check it with the event lead.',
+      RATE_LIMITED: 'Too many login attempts. Please wait 10 minutes before trying again.',
+      UNAUTHORISED: 'Your organiser session has expired or ended. Please log in again.',
+      CHECK_IN_FIRST: 'Check this attendee in before recording cup collection.',
+      UNDO_COLLECTION_FIRST: 'Undo cup collection before undoing check-in.',
+      NOT_FOUND: 'This attendee could not be found. Refresh the list.',
+      ORIGIN_DENIED: 'This website address is not allowed by the server configuration.',
+      SERVER_CONFIGURATION: 'The event server still needs configuration. Please try again later.',
+      CONFIGURATION: 'Registration is not connected yet. The organiser needs to configure Supabase before places can be reserved.',
+      NETWORK: 'Could not confirm the saved result. Check your connection and try again. If you submitted a registration, retry with the same details; a duplicate message means it was already saved.',
+    };
+    let view = 'student', sessionToken = null, capacity = null, registering = false, registered = false;
+    let attendees = [], saving = false, snapshotPromise = null, lastSync = null, dashboardReady = false;
+    const cards = new Map();
+    const configured = () => !CONFIG.supabaseUrl.includes('YOUR_') && !CONFIG.publishableKey.includes('YOUR_');
+    function fail(code) { const error = new Error(messages[code] || 'The server is unavailable. Please try again shortly.'); error.code = code; return error; }
+    function feedback(id, message) { $(id).textContent = message || ''; $(id).hidden = !message; }
+    async function api(action, data = {}, token = sessionToken) {
+      if (!configured()) throw fail('CONFIGURATION');
+      let response, result;
+      try {
+        response = await fetch(`${CONFIG.supabaseUrl.replace(/\/$/, '')}/functions/v1/event-api`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CONFIG.publishableKey, ...(token ? { 'x-organiser-session': token } : {}) },
+          body: JSON.stringify({ action, ...data }), signal: AbortSignal.timeout(15000), cache: 'no-store',
+        });
+        result = await response.json();
+      } catch { throw fail('NETWORK'); }
+      if (!response.ok) throw fail(result.error);
+      return result;
+    }
+    function showView(next) {
+      view = next;
+      for (const name of ['student', 'login', 'dashboard']) $(`${name}-view`).hidden = name !== next;
+      $('organiser-access').hidden = next !== 'student';
+    }
+    async function loadCapacity() {
+      if (registered || registering) return;
+      try {
+        const result = await api('capacity', {}, null);
+        if (registered || registering) return;
+        if (!Number.isInteger(result.remaining) || !Number.isInteger(result.registered) || result.capacity !== 150 || result.remaining < 0 || result.remaining > 150) throw fail('NETWORK');
+        capacity = result;
+        $('capacity').textContent = `${result.remaining} / 150 cups left`;
+        $('capacity-bar').style.width = `${result.registered / 150 * 100}%`;
+        $('full-state').hidden = result.remaining !== 0;
+        $('registration-content').hidden = result.remaining === 0;
+        $('register-button').disabled = result.remaining === 0;
+        feedback('capacity-error'); $('capacity-retry').hidden = true;
+      } catch (error) {
+        if (registered || registering) return;
+        capacity = null; $('capacity').textContent = 'Places unavailable';
+        $('register-button').disabled = true; feedback('capacity-error', error.message); $('capacity-retry').hidden = false;
+      }
+    }
+    $('capacity-retry').addEventListener('click', loadCapacity);
+    $('email').placeholder = `you@${CONFIG.emailDomain}`;
+    $('registration-form').addEventListener('submit', async event => {
+      event.preventDefault(); if (registering || registered || !capacity || capacity.remaining === 0) return;
+      const data = Object.fromEntries(new FormData(event.currentTarget));
+      data.fullName = data.fullName.trim(); data.email = data.email.trim().toLowerCase(); data.studentId = data.studentId.trim().toUpperCase(); data.telegram = data.telegram.trim().replace(/^@/, '');
+      if (data.email.split('@')[1] !== CONFIG.emailDomain.toLowerCase() || data.fullName.length < 2 || /[\x00-\x1f\x7f]/.test(data.fullName)) { feedback('registration-error', messages.VALIDATION); return; }
+      registering = true; $('register-button').disabled = true; $('register-button').textContent = 'Reserving your cup…'; feedback('registration-error');
+      try {
+        const result = await api('register', data, null);
+        if (result.reserved !== true || typeof result.reference !== 'string') throw fail('NETWORK');
+        registered = true; $('registration-content').hidden = true; $('full-state').hidden = true;
+        $('capacity').textContent = 'Reservation saved'; $('success-state').hidden = false;
+        $('success-name').textContent = `See you at the break, ${data.fullName}.`;
+        $('confirmation-reference').textContent = `Reference: ${result.reference}`;
+        $('success-state').focus();
+        event.target.reset();
+      } catch (error) {
+        feedback('registration-error', error.message);
+        if (error.code === 'FULL') { $('registration-content').hidden = true; $('full-state').hidden = false; $('capacity').textContent = '0 / 150 cups left'; }
+      } finally {
+        registering = false; $('register-button').textContent = 'Reserve my cup →'; $('register-button').disabled = registered || $('full-state').hidden === false;
+      }
+    });
+    $('organiser-access').addEventListener('click', () => { showView('login'); $('pin').focus(); });
+    $('back-to-event').addEventListener('click', () => { $('pin').value = ''; showView('student'); $('organiser-access').focus(); });
+    function endSession(message) {
+      sessionToken = null; attendees = []; cards.clear(); $('attendee-list').replaceChildren(); $('search').value = ''; dashboardReady = false;
+      for (const id of ['total-registered', 'total-checked', 'total-collected']) $(id).textContent = '—';
+      showView('login'); feedback('login-error', message); $('pin').focus();
+    }
+    $('login-form').addEventListener('submit', async event => {
+      event.preventDefault(); if ($('login-button').disabled) return;
+      $('login-button').disabled = true; $('login-button').textContent = 'Checking PIN…'; feedback('login-error');
+      try {
+        const result = await api('login', { pin: $('pin').value }, null);
+        if (!/^[a-f0-9]{64}$/.test(result.token)) throw fail('NETWORK');
+        sessionToken = result.token; $('pin').value = ''; feedback('dashboard-error'); showView('dashboard');
+        $('search').focus(); await refreshDashboard();
+      } catch (error) { feedback('login-error', error.message); }
+      finally { $('login-button').disabled = false; $('login-button').textContent = 'Open check-in desk →'; }
+    });
+    function displayTime(value) { return new Intl.DateTimeFormat('en-SG', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Singapore' }).format(new Date(value)); }
+    function makeCard(attendee) {
+      const card = document.createElement('article'); card.className = 'attendee';
+      // This template is constant; all submitted data is assigned with textContent.
+      card.innerHTML = '<div><h3></h3><div class="identity"></div><details><summary>Contact & registration details</summary><p class="email"></p><p class="telegram"></p><p class="registered"></p></details></div><div class="attendance-controls"><div><button class="action check" type="button"></button><p class="control-help check-help"></p></div><div><button class="action cup" type="button"></button><p class="control-help cup-help"></p></div></div>';
+      card.querySelector('.check').addEventListener('click', () => changeAttendance(attendee.id, 'checkedIn'));
+      card.querySelector('.cup').addEventListener('click', () => changeAttendance(attendee.id, 'collected'));
+      return card;
+    }
+    function renderAttendees() {
+      const query = $('search').value.trim().toLowerCase(); let matched = 0;
+      for (const a of attendees) {
+        let card = cards.get(a.id);
+        if (!card) { card = makeCard(a); cards.set(a.id, card); $('attendee-list').append(card); }
+        card.hidden = !(a.full_name.toLowerCase().includes(query) || a.student_id.toLowerCase().includes(query));
+        if (!card.hidden) matched++;
+        card.querySelector('h3').textContent = a.full_name; card.querySelector('.identity').textContent = a.student_id;
+        card.querySelector('.email').textContent = a.email; card.querySelector('.telegram').textContent = `Telegram: @${a.telegram}`;
+        card.querySelector('.registered').textContent = `Registered: ${new Date(a.registered_at).toLocaleString('en-SG', { timeZone: 'Asia/Singapore' })} (Singapore time)`;
+        const check = card.querySelector('.check'), cup = card.querySelector('.cup');
+        check.classList.toggle('done', !!a.checked_in_at); cup.classList.toggle('done', !!a.collected_at);
+        check.textContent = a.checked_in_at ? '✓ Checked in · Undo' : 'Check in';
+        cup.textContent = a.collected_at ? '✓ Collected · Undo' : 'Record cup collected';
+        check.setAttribute('aria-label', `${a.checked_in_at ? 'Undo check-in for' : 'Check in'} ${a.full_name}`);
+        cup.setAttribute('aria-label', `${a.collected_at ? 'Undo cup collection for' : 'Record cup collection for'} ${a.full_name}`);
+        check.disabled = saving || !!a.collected_at; cup.disabled = saving || !a.checked_in_at;
+        card.querySelector('.check-help').textContent = a.collected_at ? 'Undo collection first.' : a.checked_in_at ? `Saved at ${displayTime(a.checked_in_at)} SGT` : 'Mark arrival at the door.';
+        card.querySelector('.cup-help').textContent = a.collected_at ? `Saved at ${displayTime(a.collected_at)} SGT` : a.checked_in_at ? 'One cup per student.' : 'Check in first.';
+      }
+      const ids = new Set(attendees.map(a => a.id));
+      for (const [id, card] of cards) if (!ids.has(id)) { card.remove(); cards.delete(id); }
+      $('list-count').textContent = dashboardReady ? `${matched} of ${attendees.length} attendees` : '';
+      $('empty-state').hidden = !dashboardReady || matched !== 0;
+      $('empty-state').textContent = attendees.length ? 'No matches. Try another name or student ID.' : 'No registrations yet. Saved registrations will appear here.';
+    }
+    async function refreshDashboard() {
+      if (!sessionToken || view !== 'dashboard') return;
+      if (snapshotPromise) return snapshotPromise;
+      const requestedToken = sessionToken;
+      snapshotPromise = (async () => {
+        try {
+          const result = await api('snapshot');
+          if (sessionToken !== requestedToken) return;
+          if (!Array.isArray(result.attendees)) throw fail('NETWORK');
+          attendees = result.attendees; dashboardReady = true;
+          $('total-registered').textContent = result.registered; $('total-checked').textContent = result.checkedIn; $('total-collected').textContent = result.collected;
+          lastSync = new Date(); $('sync-status').textContent = `Synced ${displayTime(lastSync)} SGT · Updates every 5 seconds`;
+          feedback('dashboard-error'); renderAttendees();
+        } catch (error) {
+          if (sessionToken !== requestedToken) return;
+          if (error.code === 'UNAUTHORISED') { endSession(error.message); return; }
+          feedback('dashboard-error', error.message); $('sync-status').textContent = 'Sync paused. Displayed data may be out of date. Use Refresh to retry.';
+          throw error;
+        }
+      })();
+      try { return await snapshotPromise; } finally { snapshotPromise = null; }
+    }
+    async function changeAttendance(id, field) {
+      if (saving) return;
+      const a = attendees.find(a => a.id === id); if (!a) return;
+      const value = field === 'checkedIn' ? !a.checked_in_at : !a.collected_at;
+      saving = true; renderAttendees(); feedback('dashboard-error'); $('sync-status').textContent = 'Saving change…';
+      try {
+        if (snapshotPromise) await snapshotPromise;
+        await api('update', { id, field, value });
+        await refreshDashboard();
+      } catch (error) {
+        if (error.code === 'UNAUTHORISED') endSession(error.message);
+        else { feedback('dashboard-error', `${error.message} Refresh to check the saved state before handing out a cup.`); $('sync-status').textContent = 'Change not confirmed on this screen.'; }
+      } finally { saving = false; renderAttendees(); }
+    }
+    $('search').addEventListener('input', renderAttendees);
+    $('refresh-dashboard').addEventListener('click', () => { if (!saving) refreshDashboard().catch(() => {}); });
+    $('logout').addEventListener('click', async () => {
+      if (saving) return;
+      $('logout').disabled = true;
+      try { await api('logout'); endSession('You have been logged out.'); }
+      catch (error) { if (error.code === 'UNAUTHORISED') endSession(error.message); else feedback('dashboard-error', 'Could not end the server session. Check your connection and retry logout.'); }
+      finally { $('logout').disabled = false; }
+    });
+    setInterval(() => { if (view === 'dashboard' && !saving) refreshDashboard().catch(() => {}); }, 5000);
+    setInterval(() => { if (view === 'student') loadCapacity(); }, 15000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) { if (view === 'dashboard' && !saving) refreshDashboard().catch(() => {}); else if (view === 'student') loadCapacity(); } });
+    loadCapacity();
+  </script>
+</body>
+</html>
