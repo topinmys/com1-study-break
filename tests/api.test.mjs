@@ -92,3 +92,7 @@ test('RPC transport supports legacy local keys and carries database errors safel
   });
   assert.deepEqual(await rpc('event_register', {}), { data: null, error: { message: 'FULL' } });
 });
+test('RPC transport accepts the empty 204 response returned by logout', async () => {
+  const rpc = createRpc({ SUPABASE_URL: 'https://example.test', SUPABASE_SECRET_KEY: 'sb_secret_fake_test_key' }, async () => new Response(null, { status: 204 }));
+  assert.deepEqual(await rpc('organiser_logout', { p_hash: 'a'.repeat(64) }), { data: null, error: null });
+});

@@ -13,7 +13,8 @@ export function createRpc(env, fetcher = fetch) {
       },
       body: JSON.stringify(params), signal: AbortSignal.timeout(12000),
     });
-    const result = await response.json();
+    // PostgreSQL void functions (logout) can return HTTP 204 with no JSON body.
+    const result = response.status === 204 ? null : await response.json();
     return response.ok ? { data: result, error: null } : { data: null, error: result };
   };
 }
